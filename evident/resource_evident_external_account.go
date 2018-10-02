@@ -1,6 +1,8 @@
 package evident
 
 import (
+	"time"
+
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -59,6 +61,9 @@ func resourceExternalAccountCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(account.ID)
+
+	time.Sleep(5 * time.Second)
+
 	return resourceExternalAccountRead(d, meta)
 }
 
