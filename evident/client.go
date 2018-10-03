@@ -96,7 +96,7 @@ func makeRequest(request EvidentRequest, creds Credentials) (string, error) {
 		return "", fmt.Errorf("Error creating request: %s", err)
 	}
 
-	t := time.Now()
+	t := time.Now().UTC()
 
 	headers, _ := makeHeaders(t, request, creds)
 	for name, value := range headers {
