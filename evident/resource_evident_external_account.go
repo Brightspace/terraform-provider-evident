@@ -73,6 +73,7 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 
 	account, err := client.get(d.Id())
 	if err != nil {
+		d.SetId("")
 		return err
 	}
 
