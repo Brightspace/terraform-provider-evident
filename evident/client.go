@@ -67,7 +67,7 @@ func makeHeaders(now time.Time, req EvidentRequest, creds Credentials) (map[stri
 	ctype := "application/vnd.api+json"
 	md5sum := md5.Sum(req.Contents)
 	md5 := base64.StdEncoding.EncodeToString(md5sum[:])
-	utc := now.Format(time.RFC1123Z)
+	utc := now.Format(http.TimeFormat)
 	request := fmt.Sprintf("%s,%s,%s,%s,%s", req.Method, ctype, md5, req.URL, utc)
 	encodedAuth := makeAuth([]byte(request), []byte(creds.SecretKey))
 
