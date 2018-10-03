@@ -37,11 +37,6 @@ func resourceExternalAccount() *schema.Resource {
 				Description: "The ID of the team the external account belongs to",
 				ForceNew:    true,
 			},
-			"evident_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The ID of the external account to update an Amazon IAM credential of",
-			},
 		},
 	}
 }
@@ -77,7 +72,9 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	d.Set("evident_id", account.ID)
+	d.Set("name", account.Attributes.Name)
+	d.Set("arn", account.Attributes.Arn)
+	d.Set("external_id", account.Attributes.ExternalID)
 
 	return nil
 }
