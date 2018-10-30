@@ -177,6 +177,7 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 		var err error
 		resp, err = makeRequest(request, evident.Credentials)
 		if err != nil {
+			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
 			time.Sleep(30 * time.Second)
 		}
 		return ampt < evident.RetryMaximum, err
@@ -211,6 +212,7 @@ func (evident Evident) delete(account string) (bool, error) {
 		var err error
 		_, err = makeRequest(request, evident.Credentials)
 		if err != nil {
+			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
 			time.Sleep(30 * time.Second)
 		}
 		return ampt < evident.RetryMaximum, err
