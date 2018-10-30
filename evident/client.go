@@ -165,6 +165,7 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
+	var resp string
 
 	request := EvidentRequest{
 		Method:   "GET",
@@ -174,7 +175,7 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 
 	err = try.Do(func(ampt int) (bool, error) {
 		var err error
-		resp, err := makeRequest(request, evident.Credentials)
+		resp, err = makeRequest(request, evident.Credentials)
 		if err != nil {
 			time.Sleep(30 * time.Second)
 		}
@@ -199,6 +200,7 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 
 func (evident Evident) delete(account string) (bool, error) {
 	var err error
+
 	request := EvidentRequest{
 		Method:   "DELETE",
 		URL:      "/api/v2/external_accounts/" + account,
@@ -224,6 +226,7 @@ func (evident Evident) add(name string, arn string, externalID string, teamID st
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
+	var resp string
 
 	cmd := CmdAddExternalAccount{
 		Data: CmdAddExternalAccountPayload{
@@ -250,7 +253,7 @@ func (evident Evident) add(name string, arn string, externalID string, teamID st
 
 	err = try.Do(func(ampt int) (bool, error) {
 		var err error
-		resp, err := makeRequest(request, evident.Credentials)
+		resp, err = makeRequest(request, evident.Credentials)
 		if err != nil {
 			time.Sleep(30 * time.Second)
 		}
