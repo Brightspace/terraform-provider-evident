@@ -1,6 +1,7 @@
 package evident
 
 import (
+	"log"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -50,11 +51,13 @@ func resourceExternalAccountCreate(d *schema.ResourceData, meta interface{}) err
 	externalID := d.Get("external_id").(string)
 	teamID := d.Get("team_id").(string)
 
+	log.Printf("[DEBUG] external_account set: (ARN: %q, Name: %q, ExternalID: %q)", arn, name, externalID)
 	account, err := client.add(name, arn, externalID, teamID)
 	if err != nil {
 		return err
 	}
 
+	log.Printf("[DEBUG] external_account added: (Name: %q, ID: %q)", name, account.ID)
 	d.SetId(account.ID)
 
 	time.Sleep(5 * time.Second)
@@ -66,12 +69,14 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 	config := meta.(*Config)
 	client := config.EvidentClient
 
+	log.Printf("[DEBUG] external_account get: (ID: %q)", d.Id())
 	account, err := client.get(d.Id())
 	if err != nil {
 		d.SetId("")
 		return err
 	}
 
+	log.Printf("[DEBUG] external_account read: (ARN: %q, Name: %q, ExternalID: %q)", account.Attributes.Arn, account.Attributes.Name, account.Attributes.ExternalID)
 	d.Set("name", account.Attributes.Name)
 	d.Set("arn", account.Attributes.Arn)
 	d.Set("external_id", account.Attributes.ExternalID)
@@ -87,6 +92,7 @@ func resourceExternalAccountDelete(d *schema.ResourceData, meta interface{}) err
 	config := meta.(*Config)
 	client := config.EvidentClient
 
+	log.Printf("[DEBUG] external_account delete: (ID: %q)", d.Id())
 	_, err := client.delete(d.Id())
 	if err != nil {
 		return err
