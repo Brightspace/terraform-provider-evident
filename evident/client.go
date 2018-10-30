@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 )
@@ -90,14 +91,15 @@ func makeAuth(message []byte, key []byte) string {
 func makeRequest(request EvidentRequest, creds Credentials) (string, error) {
 	baseURL := "https://api.evident.io"
 	client := &http.Client{}
+	reqURL := baseURL + request.URL
 
-	req, err := http.NewRequest(request.Method, baseURL+request.URL, bytes.NewBuffer(request.Contents))
+	log.Printf("[DEBUG] sending request: (Request: %q, URL: %q)", request.URL, reqURL)
+	req, err := http.NewRequest(request.Method, reqURL, bytes.NewBuffer(request.Contents))
 	if err != nil {
 		return "", fmt.Errorf("Error creating request: %s", err)
 	}
 
 	t := time.Now().UTC()
-
 	headers, _ := makeHeaders(t, request, creds)
 	for name, value := range headers {
 		req.Header.Set(name, value.(string))
@@ -108,7 +110,6 @@ func makeRequest(request EvidentRequest, creds Credentials) (string, error) {
 		return "", fmt.Errorf("Error during making a request: %s", request.URL)
 
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
