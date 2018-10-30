@@ -255,6 +255,7 @@ func (evident Evident) add(name string, arn string, externalID string, teamID st
 		var err error
 		resp, err = makeRequest(request, evident.Credentials)
 		if err != nil {
+			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
 			time.Sleep(30 * time.Second)
 		}
 		return ampt < evident.RetryMaximum, err
