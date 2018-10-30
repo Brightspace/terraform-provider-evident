@@ -12,6 +12,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/matryer/try"
 )
 
 type Credentials struct {
@@ -30,7 +32,8 @@ type EvidentResponse struct {
 }
 
 type Evident struct {
-	Credentials Credentials
+	Credentials  Credentials
+	RetryMaximum int
 }
 
 type ExternalAccount struct {
@@ -161,6 +164,7 @@ func (evident Evident) all() ([]ExternalAccount, error) {
 func (evident Evident) get(account string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
+	var err error
 
 	request := EvidentRequest{
 		Method:   "GET",
@@ -168,7 +172,14 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 		Contents: []byte(""),
 	}
 
-	resp, err := makeRequest(request, evident.Credentials)
+	err = try.Do(func(ampt int) (bool, error) {
+		var err error
+		resp, err := makeRequest(request, evident.Credentials)
+		if err != nil {
+			time.Sleep(30 * time.Second)
+		}
+		return ampt < evident.RetryMaximum, err
+	})
 	if err != nil {
 		return result, err
 	}
@@ -187,13 +198,21 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 }
 
 func (evident Evident) delete(account string) (bool, error) {
+	var err error
 	request := EvidentRequest{
 		Method:   "DELETE",
 		URL:      "/api/v2/external_accounts/" + account,
 		Contents: []byte(""),
 	}
 
-	_, err := makeRequest(request, evident.Credentials)
+	err = try.Do(func(ampt int) (bool, error) {
+		var err error
+		_, err := makeRequest(request, evident.Credentials)
+		if err != nil {
+			time.Sleep(30 * time.Second)
+		}
+		return ampt < evident.RetryMaximum, err
+	})
 	if err != nil {
 		return false, err
 	}
@@ -204,6 +223,7 @@ func (evident Evident) delete(account string) (bool, error) {
 func (evident Evident) add(name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
+	var err error
 
 	cmd := CmdAddExternalAccount{
 		Data: CmdAddExternalAccountPayload{
@@ -228,10 +248,14 @@ func (evident Evident) add(name string, arn string, externalID string, teamID st
 		Contents: payloadJSON,
 	}
 
-	resp, err := makeRequest(request, evident.Credentials)
-	if err != nil {
-		return result, err
-	}
+	err = try.Do(func(ampt int) (bool, error) {
+		var err error
+		resp, err := makeRequest(request, evident.Credentials)
+		if err != nil {
+			time.Sleep(30 * time.Second)
+		}
+		return ampt < evident.RetryMaximum, err
+	})
 
 	err = json.Unmarshal([]byte(resp), &response)
 	if err != nil {
