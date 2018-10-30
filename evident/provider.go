@@ -32,7 +32,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 			AccessKey: []byte(d.Get("access_key").(string)),
 			SecretKey: []byte(d.Get("secret_key").(string)),
 		},
-		RetryMaximum: 5
+		RetryMaximum: 5,
 	}
 	config := Config{
 		EvidentClient: client,

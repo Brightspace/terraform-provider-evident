@@ -207,7 +207,7 @@ func (evident Evident) delete(account string) (bool, error) {
 
 	err = try.Do(func(ampt int) (bool, error) {
 		var err error
-		_, err := makeRequest(request, evident.Credentials)
+		_, err = makeRequest(request, evident.Credentials)
 		if err != nil {
 			time.Sleep(30 * time.Second)
 		}
