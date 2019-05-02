@@ -121,10 +121,16 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 
 	}
 
+	/*
+	* //TODO: FIX Logic:
+	* This logic doesn't seem to be correct. must be tested with real api data.
+	* Commented out for now.
+
 	contentType := resp.Header.Get("Content-Type")
 	if contentType == "application/vnd.api+json" {
 		return "", fmt.Errorf("Content-Type is not a json type. Got: %s", contentType)
 	}
+	*/
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -261,6 +267,61 @@ func (evident *Evident) add(name string, arn string, externalID string, teamID s
 	request := EvidentRequest{
 		Method:   "POST",
 		URL:      "/api/v2/external_accounts",
+		Contents: payloadJSON,
+	}
+
+	err = try.Do(func(ampt int) (bool, error) {
+		var err error
+		resp, err = evident.makeRequest(request, evident.Credentials)
+		if err != nil {
+			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
+			time.Sleep(30 * time.Second)
+		}
+		return ampt < evident.RetryMaximum, err
+	})
+
+	err = json.Unmarshal([]byte(resp), &response)
+	if err != nil {
+		return result, err
+	}
+
+	err = json.Unmarshal([]byte(response.Data), &result)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+
+func (evident *Evident) update(account string, name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
+	var response EvidentResponse
+	var result ExternalAccount
+	var err error
+	var resp string
+
+	// Update Payload is the same as create payload so we use the same
+	// payload for requesting
+	cmd := CmdAddExternalAccount{
+		Data: CmdAddExternalAccountPayload{
+			Type: "external_accounts",
+			Attributes: CmdAddExternalAccountAttributes{
+				Name:       name,
+				ExternalID: externalID,
+				TeamID:     teamID,
+				ARN:        arn,
+			},
+		},
+	}
+
+	payloadJSON, err := json.Marshal(cmd)
+	if err != nil {
+		return result, err
+	}
+
+	request := EvidentRequest{
+		Method:   "PATCH",
+		URL:      fmt.Sprintf("/api/v2/external_accounts/%+v",account),
 		Contents: payloadJSON,
 	}
 
