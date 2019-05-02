@@ -32,6 +32,7 @@ type EvidentResponse struct {
 }
 
 type Evident struct {
+	HttpClient *http.Client
 	Credentials  Credentials
 	RetryMaximum int
 }
@@ -91,9 +92,9 @@ func makeAuth(message []byte, key []byte) string {
 	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
 }
 
-func makeRequest(request EvidentRequest, creds Credentials) (string, error) {
+func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (string, error) {
 	baseURL := "https://api.evident.io"
-	client := &http.Client{}
+	client := evident.GetHttpClient()
 	reqURL := baseURL + request.URL
 
 	log.Printf("[DEBUG] sending request: (Request: %q, URL: %q)", request.URL, reqURL)
@@ -132,8 +133,18 @@ func makeRequest(request EvidentRequest, creds Credentials) (string, error) {
 
 	return string(bytes), nil
 }
+func (evident *Evident) SetHttpClient(client *http.Client) {
+	evident.HttpClient = client
+}
 
-func (evident Evident) all() ([]ExternalAccount, error) {
+func (evident *Evident) GetHttpClient() *http.Client {
+	if evident.HttpClient == nil {
+		evident.HttpClient = &http.Client{}
+	}
+	return evident.HttpClient
+}
+
+func (evident *Evident) all() ([]ExternalAccount, error) {
 	var response EvidentResponse
 	var result []ExternalAccount
 
@@ -143,7 +154,7 @@ func (evident Evident) all() ([]ExternalAccount, error) {
 		Contents: []byte(""),
 	}
 
-	resp, err := makeRequest(request, evident.Credentials)
+	resp, err := evident.makeRequest(request, evident.Credentials)
 	if err != nil {
 		return result, err
 	}
@@ -161,7 +172,7 @@ func (evident Evident) all() ([]ExternalAccount, error) {
 	return result, nil
 }
 
-func (evident Evident) get(account string) (ExternalAccount, error) {
+func (evident *Evident) get(account string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
@@ -175,7 +186,7 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 
 	err = try.Do(func(ampt int) (bool, error) {
 		var err error
-		resp, err = makeRequest(request, evident.Credentials)
+		resp, err = evident.makeRequest(request, evident.Credentials)
 		if err != nil {
 			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
 			time.Sleep(30 * time.Second)
@@ -199,7 +210,7 @@ func (evident Evident) get(account string) (ExternalAccount, error) {
 	return result, nil
 }
 
-func (evident Evident) delete(account string) (bool, error) {
+func (evident *Evident) delete(account string) (bool, error) {
 	var err error
 
 	request := EvidentRequest{
@@ -210,7 +221,7 @@ func (evident Evident) delete(account string) (bool, error) {
 
 	err = try.Do(func(ampt int) (bool, error) {
 		var err error
-		_, err = makeRequest(request, evident.Credentials)
+		_, err = evident.makeRequest(request, evident.Credentials)
 		if err != nil {
 			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
 			time.Sleep(30 * time.Second)
@@ -224,7 +235,7 @@ func (evident Evident) delete(account string) (bool, error) {
 	return true, nil
 }
 
-func (evident Evident) add(name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
+func (evident *Evident) add(name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
@@ -255,7 +266,7 @@ func (evident Evident) add(name string, arn string, externalID string, teamID st
 
 	err = try.Do(func(ampt int) (bool, error) {
 		var err error
-		resp, err = makeRequest(request, evident.Credentials)
+		resp, err = evident.makeRequest(request, evident.Credentials)
 		if err != nil {
 			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
 			time.Sleep(30 * time.Second)
