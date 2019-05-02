@@ -32,3 +32,5 @@
 
 # Terraform files
 terraform.d/
+
+*.vscode
