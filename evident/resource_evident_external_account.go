@@ -85,7 +85,26 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceExternalAccountUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	config := meta.(*Config)
+	client := config.EvidentClient
+
+	name := d.Get("name").(string)
+	arn := d.Get("arn").(string)
+	externalID := d.Get("external_id").(string)
+	teamID := d.Get("team_id").(string)
+
+	log.Printf("[DEBUG] external_account set: (ARN: %q, Name: %q, ExternalID: %q)", arn, name, externalID)
+	account, err := client.update(d.Id(), name, arn, externalID, teamID)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("[DEBUG] external_account updated: (Name: %q, ID: %q)", name, account.ID)
+	d.SetId(account.ID)
+
+	time.Sleep(5 * time.Second)
+
+	return resourceExternalAccountRead(d, meta)
 }
 
 func resourceExternalAccountDelete(d *schema.ResourceData, meta interface{}) error {
