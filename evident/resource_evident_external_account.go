@@ -3,7 +3,6 @@ package evident
 import (
 	"log"
 	"time"
-	//"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -59,8 +58,9 @@ func resourceExternalAccountCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	log.Printf("[DEBUG] external_account added: (Name: %q, ID: %q)", name, account.ID)
-
 	d.SetId(account.GetIdString())
+	d.Set("arn", account.Attributes.Arn)
+	d.Set("external_id", account.Attributes.ExternalID)
 
 	time.Sleep(5 * time.Second)
 
@@ -79,7 +79,6 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	log.Printf("[DEBUG] external_account read: (ARN: %q, Name: %q, ExternalID: %q)", account.Attributes.Arn, account.Attributes.Name, account.Attributes.ExternalID)
-	d.Set("name", account.Attributes.Name)
 	d.Set("arn", account.Attributes.Arn)
 	d.Set("external_id", account.Attributes.ExternalID)
 
@@ -103,6 +102,8 @@ func resourceExternalAccountUpdate(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] external_account updated: (Name: %q, ID: %q)", name, account.ID)
 	d.SetId(account.GetIdString())
+	d.Set("arn", account.Attributes.Arn)
+	d.Set("external_id", account.Attributes.ExternalID)
 
 	time.Sleep(5 * time.Second)
 
@@ -118,8 +119,6 @@ func resourceExternalAccountDelete(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-
 	d.SetId("")
-
 	return nil
 }

@@ -2,16 +2,12 @@ package evident
 
 import (
 	"testing"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"net/http"
 	"net/http/httptest"
-	"fmt"
 	"bytes"
 	"io/ioutil"
-
-	
 )
 var testEvidentProviders map[string]terraform.ResourceProvider
 var testEvidentProvider *schema.Provider
@@ -28,7 +24,7 @@ var fakeTeamId string = "1231255543"
 var updatedFakeArn string = "updatedFakearn"
 var updatedFakeName string = "updatedFakename"
 var updatedFakeExternalId string = "12345678966"
-var updatedFakeTeamId string = "updatedFaketeamid"
+var updatedFakeTeamId string = "443432324234"
 
 var state string = ""
 
@@ -49,14 +45,15 @@ func NewTestClient(fn RoundTripFunc) *http.Client {
 
 
 func init() {
-	
 	fakeHttpServer = httptest.NewServer(fakeTestHandler)
 	testEvidentProvider = Provider().(*schema.Provider)
 	testEvidentProvider.ConfigureFunc = testConfigureFunction
 	testEvidentProviders = map[string]terraform.ResourceProvider{
 		"evident": testEvidentProvider,
 	}
-	fmt.Printf("\nDone here")
+}
+func updateState(newState string) {
+	state = newState
 }
 func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 	
@@ -65,11 +62,11 @@ func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 
 	httpClient := NewTestClient(func(r *http.Request) *http.Response {
 		if r.Method == "POST" {
-			state = "created"
+			updateState("created")
 			bodyString = GetTestOkResponse(fakeId,fakeArn,fakeExternalId,fakeTeamId)
 			status = 200
 		} else if r.Method  == "PATCH" {
-			state = "updated"
+			updateState("updated")
 			bodyString = GetTestOkResponse(fakeId,updatedFakeName,updatedFakeExternalId,updatedFakeTeamId)
 		} else if r.Method == "GET" {
 			if state == "created"{
@@ -81,7 +78,7 @@ func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 				status = 404
 			}
 		} else if r.Method == "DELETE" {
-			state = "deleted"
+			updateState("deleted")
 			bodyString = "{}"
 		}
 		return &http.Response{

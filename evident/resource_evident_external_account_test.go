@@ -26,12 +26,7 @@ func TestEvidentExternalAccountBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"evident_external_account.test_account", "arn", fakeArn),
 					resource.TestCheckResourceAttr(
-						"evident_external_account.test_account", "name", fakeName),
-					resource.TestCheckResourceAttr(
 						"evident_external_account.test_account", "external_id", fakeExternalId),
-					resource.TestCheckResourceAttr(
-						"evident_external_account.test_account", "team_id", fakeTeamId),
-					
 				),
 			},
 		},

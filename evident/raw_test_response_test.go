@@ -13,7 +13,7 @@ func GetTestOkResponse(account string, arn string, externalId string,teamId stri
 			"attributes": {
 				"account": "123456789012",
 				"arn": "%s",
-				"external_id": "test_sts_external_id_1",
+				"external_id": "%s",
 				"created_at": "2017-03-09T20:44:08.569Z",
 				"updated_at": "2017-03-09T20:44:08.569Z"
 			},
@@ -23,7 +23,7 @@ func GetTestOkResponse(account string, arn string, externalId string,teamId stri
 						"related": "https://api.evident.io/api/v2/external_accounts/1016.json_api"
 					},
 					"data": {
-						"id": 1,
+						"id": %s,
 						"type": "external_accounts"
 					}
 				}
@@ -106,7 +106,7 @@ func GetTestOkResponse(account string, arn string, externalId string,teamId stri
 			}
 		]
 	}
-	`,account , arn, externalId ,teamId)
+	`,account , arn, externalId,externalId,externalId ,teamId)
 }
 
 

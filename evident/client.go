@@ -69,6 +69,13 @@ type CmdAddExternalAccountAttributes struct {
 	TeamID     string `json:"team_id"`
 }
 
+
+//TODO: FIX Logic:
+//We don't have Name and Provider in the attributes they are in related entities
+//so our resource assessment is wrong (only ids and arns work which should suffice for now)
+//at some point we should integrate the jsonapi client into this
+//also we don't add team id to resources which might cause troubles in the future
+
 type ExternalAccountAttributes struct {
 	Name       string `json:"name"`
 	Provider   string `json:"provider"`
@@ -108,7 +115,6 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	client := evident.GetHttpClient()
 	reqURL := baseURL + request.URL
 
-	fmt.Printf("[DEBUG] sending request: (Request: %q, URL: %q) method: %s", request.URL, reqURL, request.Method)
 	log.Printf("[DEBUG] sending request: (Request: %q, URL: %q)", request.URL, reqURL)
 	req, err := http.NewRequest(request.Method, reqURL, bytes.NewBuffer(request.Contents))
 	if err != nil {
@@ -120,20 +126,17 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	for name, value := range headers {
 		req.Header.Set(name, value.(string))
 	}
-	fmt.Println("\nSTAGE1")
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("Error during making a request: %s", request.URL)
 
 	}
-	fmt.Println("\nSTAGE2")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("HTTP request error. Response code: %d", resp.StatusCode)
 
 	}
-	fmt.Printf("\n %s","bingo")
 
 	/*
 	* //TODO: FIX Logic:
@@ -147,7 +150,6 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	*/
 
 	bytes, err := ioutil.ReadAll(resp.Body)
-	fmt.Printf("\n %s",string(bytes))
 	if err != nil {
 		return "", fmt.Errorf("Error while reading response body. %s", err)
 	}
@@ -160,7 +162,6 @@ func (evident *Evident) SetHttpClient(client *http.Client) {
 
 func (evident *Evident) GetHttpClient() *http.Client {
 	if evident.HttpClient == nil {
-		fmt.Printf("\nWrong place")
 		evident.HttpClient = &http.Client{}
 	}
 	return evident.HttpClient
