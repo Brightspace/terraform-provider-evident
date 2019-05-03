@@ -12,7 +12,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-	//"strconv"
 
 	"github.com/matryer/try"
 )
