@@ -33,13 +33,13 @@ type EvidentResponse struct {
 }
 
 type Evident struct {
-	HttpClient *http.Client
+	HttpClient   *http.Client
 	Credentials  Credentials
 	RetryMaximum int
 }
 
 type ExternalAccount struct {
-	ID         interface{}                    `json:"id"`
+	ID         interface{}               `json:"id"`
 	Attributes ExternalAccountAttributes `json:"attributes"`
 }
 
@@ -47,9 +47,9 @@ func (ec *ExternalAccount) GetIdString() string {
 
 	switch v := ec.ID.(type) {
 	case float64:
-		return fmt.Sprintf("%.0f",v)
+		return fmt.Sprintf("%.0f", v)
 	default:
-		return fmt.Sprintf("%+v",v)
+		return fmt.Sprintf("%+v", v)
 	}
 }
 
@@ -68,7 +68,6 @@ type CmdAddExternalAccountAttributes struct {
 	ARN        string `json:"arn"`
 	TeamID     string `json:"team_id"`
 }
-
 
 //TODO: FIX Logic:
 //We don't have Name and Provider in the attributes they are in related entities
@@ -139,14 +138,14 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	}
 
 	/*
-	* //TODO: FIX Logic:
-	* This logic doesn't seem to be correct. must be tested with real api data.
-	* Commented out for now.
+		* //TODO: FIX Logic:
+		* This logic doesn't seem to be correct. must be tested with real api data.
+		* Commented out for now.
 
-	contentType := resp.Header.Get("Content-Type")
-	if contentType == "application/vnd.api+json" {
-		return "", fmt.Errorf("Content-Type is not a json type. Got: %s", contentType)
-	}
+		contentType := resp.Header.Get("Content-Type")
+		if contentType == "application/vnd.api+json" {
+			return "", fmt.Errorf("Content-Type is not a json type. Got: %s", contentType)
+		}
 	*/
 
 	bytes, err := ioutil.ReadAll(resp.Body)
@@ -310,7 +309,6 @@ func (evident *Evident) add(name string, arn string, externalID string, teamID s
 	return result, nil
 }
 
-
 func (evident *Evident) update(account string, name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
@@ -338,7 +336,7 @@ func (evident *Evident) update(account string, name string, arn string, external
 
 	request := EvidentRequest{
 		Method:   "PATCH",
-		URL:      fmt.Sprintf("/api/v2/external_accounts/%+v",account),
+		URL:      fmt.Sprintf("/api/v2/external_accounts/%+v", account),
 		Contents: payloadJSON,
 	}
 

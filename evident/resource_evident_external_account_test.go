@@ -3,20 +3,19 @@ package evident
 import (
 	"testing"
 
+	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"fmt"
 )
-
 
 func TestEvidentExternalAccountBasic(t *testing.T) {
 	updateState("")
 	resource.Test(t, resource.TestCase{
-		/* 
+		/*
 		* we might need to add precheck in order to make sure environment
 		* variables are added . skipped for now.
-		*/
-		PreCheck:     func() { },
+		 */
+		PreCheck:     func() {},
 		Providers:    testEvidentProviders,
 		CheckDestroy: testEvidentExternalAccountDestroy,
 		Steps: []resource.TestStep{
@@ -37,11 +36,11 @@ func TestEvidentExternalAccountBasic(t *testing.T) {
 func TestEvidentExternalAccountUpdate(t *testing.T) {
 	updateState("")
 	resource.Test(t, resource.TestCase{
-		/* 
+		/*
 		* we might need to add precheck in order to make sure environment
 		* variables are added . skipped for now.
-		*/
-		PreCheck:     func() { },
+		 */
+		PreCheck:     func() {},
 		Providers:    testEvidentProviders,
 		CheckDestroy: testEvidentExternalAccountDestroy,
 		Steps: []resource.TestStep{
@@ -77,7 +76,7 @@ func testEvidentExternalAccountBasicConfig() string {
 			external_id = "%s"
 			team_id     = "%s"
 		}
-	`,fakeArn,fakeName,fakeExternalId,fakeTeamId)
+	`, fakeArn, fakeName, fakeExternalId, fakeTeamId)
 }
 
 func testEvidentExternalAccountUpdateConfig() string {
@@ -88,7 +87,7 @@ func testEvidentExternalAccountUpdateConfig() string {
 			external_id = "%s"
 			team_id     = "%s"
 		}
-	`,updatedFakeArn,fakeName,updatedFakeExternalId,updatedFakeTeamId)
+	`, updatedFakeArn, fakeName, updatedFakeExternalId, updatedFakeTeamId)
 }
 
 func testEvidentExternalAccountExists(resource string) resource.TestCheckFunc {

@@ -1,20 +1,20 @@
 package evident
 
 import (
-	"testing"
+	"bytes"
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"bytes"
-	"io/ioutil"
-	"fmt"
+	"testing"
 )
+
 var testEvidentProviders map[string]terraform.ResourceProvider
 var testEvidentProvider *schema.Provider
 var fakeHttpServer *httptest.Server
 var fakeTestHandler http.HandlerFunc
-
 
 var fakeId string = "1232193123"
 var fakeArn string = "fakearn"
@@ -43,7 +43,6 @@ func NewTestClient(fn RoundTripFunc) *http.Client {
 	}
 }
 
-
 func init() {
 	fakeHttpServer = httptest.NewServer(fakeTestHandler)
 	testEvidentProvider = Provider().(*schema.Provider)
@@ -53,27 +52,26 @@ func init() {
 	}
 }
 func updateState(newState string) {
-	fmt.Printf("\nupdating state from %+v -> %+v\n" , state,newState)
+	fmt.Printf("\nupdating state from %+v -> %+v\n", state, newState)
 	state = newState
 }
 func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
-	
 	status := 200
 	bodyString := ""
 
 	httpClient := NewTestClient(func(r *http.Request) *http.Response {
 		if r.Method == "POST" {
 			updateState("created")
-			bodyString = GetTestOkResponse(fakeId,fakeArn,fakeExternalId,fakeTeamId)
+			bodyString = GetTestOkResponse(fakeId, fakeArn, fakeExternalId, fakeTeamId)
 			status = 200
-		} else if r.Method  == "PATCH" {
+		} else if r.Method == "PATCH" {
 			updateState("updated")
-			bodyString = GetTestOkResponse(fakeId,updatedFakeArn,updatedFakeExternalId,updatedFakeTeamId)
+			bodyString = GetTestOkResponse(fakeId, updatedFakeArn, updatedFakeExternalId, updatedFakeTeamId)
 		} else if r.Method == "GET" {
-			if state == "created"{
-				bodyString = GetTestOkResponse(fakeId,fakeArn,fakeExternalId,fakeTeamId)
+			if state == "created" {
+				bodyString = GetTestOkResponse(fakeId, fakeArn, fakeExternalId, fakeTeamId)
 			} else if state == "updated" {
-				bodyString = GetTestOkResponse(fakeId,updatedFakeArn,updatedFakeExternalId,updatedFakeTeamId)
+				bodyString = GetTestOkResponse(fakeId, updatedFakeArn, updatedFakeExternalId, updatedFakeTeamId)
 			} else {
 				bodyString = "{}"
 				status = 404
@@ -85,12 +83,12 @@ func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 		return &http.Response{
 			StatusCode: status,
 			// Send response to be tested
-			Body:       ioutil.NopCloser(bytes.NewBufferString(bodyString)),
- 			// Must be set to non-nil value or it panics
-			Header:     make(http.Header),
+			Body: ioutil.NopCloser(bytes.NewBufferString(bodyString)),
+			// Must be set to non-nil value or it panics
+			Header: make(http.Header),
 		}
 	})
-	
+
 	client := Evident{
 		Credentials: Credentials{
 			AccessKey: []byte(d.Get("access_key").(string)),
@@ -104,9 +102,8 @@ func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	return &config, nil
-	
-}
 
+}
 
 func TestProvider(t *testing.T) {
 	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {

@@ -1,10 +1,10 @@
 package evident
 
-import(
+import (
 	"fmt"
 )
 
-func GetTestOkResponse(account string, arn string, externalId string,teamId string) string {
+func GetTestOkResponse(account string, arn string, externalId string, teamId string) string {
 	return fmt.Sprintf(`
 	{
 		"data": {
@@ -106,7 +106,5 @@ func GetTestOkResponse(account string, arn string, externalId string,teamId stri
 			}
 		]
 	}
-	`,account , arn, externalId,externalId,externalId ,teamId)
+	`, account, arn, externalId, externalId, externalId, teamId)
 }
-
-
