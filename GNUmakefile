@@ -25,7 +25,7 @@ test: fmtcheck
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: fmtcheck
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 EVIDENT_ACCESS_KEY=something EVIDENT_SECRET_KEY=somethingelse go test $(TEST) -v $(TESTARGS) -timeout 120m
 
 vet:
 	@echo "go vet ."
