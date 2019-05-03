@@ -12,11 +12,13 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The working directory where to run.",
+				DefaultFunc: schema.EnvDefaultFunc("EVIDENT_ACCESS_KEY", nil),
 			},
 			"secret_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Create command",
+				DefaultFunc: schema.EnvDefaultFunc("EVIDENT_SECRET_KEY", nil),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
