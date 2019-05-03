@@ -2,7 +2,6 @@ package evident
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"io/ioutil"

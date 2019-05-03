@@ -314,8 +314,6 @@ func (evident *Evident) update(account string, name string, arn string, external
 	var err error
 	var resp string
 
-	// Update Payload is the same as create payload so we use the same
-	// payload for requesting
 	cmd := CmdAddExternalAccount{
 		Data: CmdAddExternalAccountPayload{
 			Type: "external_accounts",
