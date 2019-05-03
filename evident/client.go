@@ -41,7 +41,6 @@ type Evident struct {
 type ExternalAccount struct {
 	ID         interface{}                    `json:"id"`
 	Attributes ExternalAccountAttributes `json:"attributes"`
-	//RelationShips ExternalAccountRelationShips `json:"relationships"`
 }
 
 func (ec *ExternalAccount) GetIdString() string {
