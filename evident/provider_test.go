@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"bytes"
 	"io/ioutil"
+	"fmt"
 )
 var testEvidentProviders map[string]terraform.ResourceProvider
 var testEvidentProvider *schema.Provider
@@ -22,7 +23,6 @@ var fakeExternalId string = "676767666"
 var fakeTeamId string = "1231255543"
 
 var updatedFakeArn string = "updatedFakearn"
-var updatedFakeName string = "updatedFakename"
 var updatedFakeExternalId string = "12345678966"
 var updatedFakeTeamId string = "443432324234"
 
@@ -53,6 +53,7 @@ func init() {
 	}
 }
 func updateState(newState string) {
+	fmt.Printf("\nupdating state from %+v -> %+v\n" , state,newState)
 	state = newState
 }
 func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
@@ -67,12 +68,12 @@ func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 			status = 200
 		} else if r.Method  == "PATCH" {
 			updateState("updated")
-			bodyString = GetTestOkResponse(fakeId,updatedFakeName,updatedFakeExternalId,updatedFakeTeamId)
+			bodyString = GetTestOkResponse(fakeId,updatedFakeArn,updatedFakeExternalId,updatedFakeTeamId)
 		} else if r.Method == "GET" {
 			if state == "created"{
 				bodyString = GetTestOkResponse(fakeId,fakeArn,fakeExternalId,fakeTeamId)
 			} else if state == "updated" {
-				bodyString = GetTestOkResponse(fakeId,updatedFakeName,updatedFakeExternalId,updatedFakeTeamId)
+				bodyString = GetTestOkResponse(fakeId,updatedFakeArn,updatedFakeExternalId,updatedFakeTeamId)
 			} else {
 				bodyString = "{}"
 				status = 404

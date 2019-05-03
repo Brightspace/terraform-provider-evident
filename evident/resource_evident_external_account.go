@@ -19,24 +19,25 @@ func resourceExternalAccount() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Amazon Resource Name for the IAM role",
-				ForceNew:    true,
+				ForceNew:     false,
 			},
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name",
-				ForceNew:    true,
+				ForceNew:     true,
 			},
 			"external_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "External Identifier set on the role",
+				ForceNew:     false,
 			},
 			"team_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of the team the external account belongs to",
-				ForceNew:    true,
+				ForceNew:     false,
 			},
 		},
 	}

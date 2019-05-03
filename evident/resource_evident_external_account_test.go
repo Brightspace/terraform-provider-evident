@@ -10,6 +10,7 @@ import (
 
 
 func TestEvidentExternalAccountBasic(t *testing.T) {
+	updateState("")
 	resource.Test(t, resource.TestCase{
 		/* 
 		* we might need to add precheck in order to make sure environment
@@ -33,6 +34,41 @@ func TestEvidentExternalAccountBasic(t *testing.T) {
 	})
 }
 
+func TestEvidentExternalAccountUpdate(t *testing.T) {
+	updateState("")
+	resource.Test(t, resource.TestCase{
+		/* 
+		* we might need to add precheck in order to make sure environment
+		* variables are added . skipped for now.
+		*/
+		PreCheck:     func() { },
+		Providers:    testEvidentProviders,
+		CheckDestroy: testEvidentExternalAccountDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testEvidentExternalAccountBasicConfig(),
+				Check: resource.ComposeTestCheckFunc(
+					testEvidentExternalAccountExists("evident_external_account.test_account"),
+					resource.TestCheckResourceAttr(
+						"evident_external_account.test_account", "arn", fakeArn),
+					resource.TestCheckResourceAttr(
+						"evident_external_account.test_account", "external_id", fakeExternalId),
+				),
+			},
+			{
+				Config: testEvidentExternalAccountUpdateConfig(),
+				Check: resource.ComposeTestCheckFunc(
+					testEvidentExternalAccountExists("evident_external_account.test_account"),
+					resource.TestCheckResourceAttr(
+						"evident_external_account.test_account", "arn", updatedFakeArn),
+					resource.TestCheckResourceAttr(
+						"evident_external_account.test_account", "external_id", updatedFakeExternalId),
+				),
+			},
+		},
+	})
+}
+
 func testEvidentExternalAccountBasicConfig() string {
 	return fmt.Sprintf(`
 		resource "evident_external_account" "test_account" {
@@ -42,6 +78,17 @@ func testEvidentExternalAccountBasicConfig() string {
 			team_id     = "%s"
 		}
 	`,fakeArn,fakeName,fakeExternalId,fakeTeamId)
+}
+
+func testEvidentExternalAccountUpdateConfig() string {
+	return fmt.Sprintf(`
+		resource "evident_external_account" "test_account" {
+			arn        = "%s"
+			name        = "%s"
+			external_id = "%s"
+			team_id     = "%s"
+		}
+	`,updatedFakeArn,fakeName,updatedFakeExternalId,updatedFakeTeamId)
 }
 
 func testEvidentExternalAccountExists(resource string) resource.TestCheckFunc {
