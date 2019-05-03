@@ -52,7 +52,6 @@ func init() {
 	}
 }
 func updateState(newState string) {
-	fmt.Printf("\nupdating state from %+v -> %+v\n", state, newState)
 	state = newState
 }
 func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
