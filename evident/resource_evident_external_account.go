@@ -19,13 +19,11 @@ func resourceExternalAccount() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Amazon Resource Name for the IAM role",
-				ForceNew:    true,
 			},
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name",
-				ForceNew:    true,
 			},
 			"external_id": &schema.Schema{
 				Type:        schema.TypeString,
@@ -36,7 +34,6 @@ func resourceExternalAccount() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of the team the external account belongs to",
-				ForceNew:    true,
 			},
 		},
 	}
@@ -77,7 +74,6 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	log.Printf("[DEBUG] external_account read: (ARN: %q, Name: %q, ExternalID: %q)", account.Attributes.Arn, account.Attributes.Name, account.Attributes.ExternalID)
-	d.Set("name", account.Attributes.Name)
 	d.Set("arn", account.Attributes.Arn)
 	d.Set("external_id", account.Attributes.ExternalID)
 
@@ -116,8 +112,6 @@ func resourceExternalAccountDelete(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-
 	d.SetId("")
-
 	return nil
 }
