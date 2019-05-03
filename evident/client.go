@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	//"strconv"
 
 	"github.com/matryer/try"
 )
@@ -38,8 +39,19 @@ type Evident struct {
 }
 
 type ExternalAccount struct {
-	ID         string                    `json:"id"`
+	ID         interface{}                    `json:"id"`
 	Attributes ExternalAccountAttributes `json:"attributes"`
+	//RelationShips ExternalAccountRelationShips `json:"relationships"`
+}
+
+func (ec *ExternalAccount) GetIdString() string {
+
+	switch v := ec.ID.(type) {
+	case float64:
+		return fmt.Sprintf("%.0f",v)
+	default:
+		return fmt.Sprintf("%+v",v)
+	}
 }
 
 type CmdAddExternalAccount struct {
@@ -97,6 +109,7 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	client := evident.GetHttpClient()
 	reqURL := baseURL + request.URL
 
+	fmt.Printf("[DEBUG] sending request: (Request: %q, URL: %q) method: %s", request.URL, reqURL, request.Method)
 	log.Printf("[DEBUG] sending request: (Request: %q, URL: %q)", request.URL, reqURL)
 	req, err := http.NewRequest(request.Method, reqURL, bytes.NewBuffer(request.Contents))
 	if err != nil {
@@ -108,18 +121,20 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	for name, value := range headers {
 		req.Header.Set(name, value.(string))
 	}
-
+	fmt.Println("\nSTAGE1")
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("Error during making a request: %s", request.URL)
 
 	}
+	fmt.Println("\nSTAGE2")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("HTTP request error. Response code: %d", resp.StatusCode)
 
 	}
+	fmt.Printf("\n %s","bingo")
 
 	/*
 	* //TODO: FIX Logic:
@@ -133,6 +148,7 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	*/
 
 	bytes, err := ioutil.ReadAll(resp.Body)
+	fmt.Printf("\n %s",string(bytes))
 	if err != nil {
 		return "", fmt.Errorf("Error while reading response body. %s", err)
 	}
@@ -145,6 +161,7 @@ func (evident *Evident) SetHttpClient(client *http.Client) {
 
 func (evident *Evident) GetHttpClient() *http.Client {
 	if evident.HttpClient == nil {
+		fmt.Printf("\nWrong place")
 		evident.HttpClient = &http.Client{}
 	}
 	return evident.HttpClient
