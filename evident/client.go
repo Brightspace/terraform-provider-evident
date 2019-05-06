@@ -38,8 +38,17 @@ type Evident struct {
 }
 
 type ExternalAccount struct {
-	ID         string                    `json:"id"`
+	ID         interface{}                    `json:"id"`
 	Attributes ExternalAccountAttributes `json:"attributes"`
+}
+
+func (ec *ExternalAccount) GetIdString() string {
+	switch v := ec.ID.(type) {
+	case float64:
+		return fmt.Sprintf("%.0f",v)
+	default:
+		return fmt.Sprintf("%+v",v)
+	}
 }
 
 type CmdAddExternalAccount struct {

@@ -58,7 +58,7 @@ func resourceExternalAccountCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	log.Printf("[DEBUG] external_account added: (Name: %q, ID: %q)", name, account.ID)
-	d.SetId(account.ID)
+	d.SetId(account.GetIdString())
 
 	time.Sleep(5 * time.Second)
 
@@ -100,7 +100,7 @@ func resourceExternalAccountUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	log.Printf("[DEBUG] external_account updated: (Name: %q, ID: %q)", name, account.ID)
-	d.SetId(account.ID)
+	d.SetId(account.GetIdString())
 
 	time.Sleep(5 * time.Second)
 
