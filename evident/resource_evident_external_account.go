@@ -19,13 +19,11 @@ func resourceExternalAccount() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Amazon Resource Name for the IAM role",
-				ForceNew:    true,
 			},
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name",
-				ForceNew:    true,
 			},
 			"external_id": &schema.Schema{
 				Type:        schema.TypeString,
@@ -36,7 +34,6 @@ func resourceExternalAccount() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The ID of the team the external account belongs to",
-				ForceNew:    true,
 			},
 		},
 	}
@@ -116,8 +113,6 @@ func resourceExternalAccountDelete(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-
 	d.SetId("")
-
 	return nil
 }
