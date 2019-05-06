@@ -60,8 +60,6 @@ func resourceExternalAccountCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] external_account added: (Name: %q, ID: %q)", name, account.ID)
 	d.SetId(account.GetIdString())
-	d.Set("arn", account.Attributes.Arn)
-	d.Set("external_id", account.Attributes.ExternalID)
 
 	time.Sleep(5 * time.Second)
 
