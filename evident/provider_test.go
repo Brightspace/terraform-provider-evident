@@ -22,6 +22,7 @@ var fakeExternalId string = "676767666"
 var fakeTeamId string = "1231255543"
 
 var updatedFakeArn string = "updatedFakearn"
+var updatedFakeName string = "updatedFakeName"
 var updatedFakeExternalId string = "12345678966"
 var updatedFakeTeamId string = "443432324234"
 
@@ -60,16 +61,16 @@ func testConfigureFunction(d *schema.ResourceData) (interface{}, error) {
 	httpClient := NewTestClient(func(r *http.Request) *http.Response {
 		if r.Method == "POST" {
 			updateState("created")
-			bodyString = GetTestOkResponse(fakeId, fakeArn, fakeExternalId, fakeTeamId)
+			bodyString = GetTestOkResponse(fakeId, fakeArn, fakeExternalId, fakeTeamId, fakeName)
 			status = 200
 		} else if r.Method == "PATCH" {
 			updateState("updated")
-			bodyString = GetTestOkResponse(fakeId, updatedFakeArn, updatedFakeExternalId, updatedFakeTeamId)
+			bodyString = GetTestOkResponse(fakeId, updatedFakeArn, updatedFakeExternalId, updatedFakeTeamId, updatedFakeName)
 		} else if r.Method == "GET" {
 			if state == "created" {
-				bodyString = GetTestOkResponse(fakeId, fakeArn, fakeExternalId, fakeTeamId)
+				bodyString = GetTestOkResponse(fakeId, fakeArn, fakeExternalId, fakeTeamId, fakeName)
 			} else if state == "updated" {
-				bodyString = GetTestOkResponse(fakeId, updatedFakeArn, updatedFakeExternalId, updatedFakeTeamId)
+				bodyString = GetTestOkResponse(fakeId, updatedFakeArn, updatedFakeExternalId, updatedFakeTeamId, updatedFakeName)
 			} else {
 				bodyString = "{}"
 				status = 404

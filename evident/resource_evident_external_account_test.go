@@ -51,15 +51,19 @@ func TestEvidentExternalAccountUpdate(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"evident_external_account.test_account", "arn", fakeArn),
 					resource.TestCheckResourceAttr(
+						"evident_external_account.test_account", "name", fakeName),
+					resource.TestCheckResourceAttr(
 						"evident_external_account.test_account", "external_id", fakeExternalId),
 				),
 			},
 			{
-				Config: testEvidentExternalAccountConfig(updatedFakeArn, fakeName, updatedFakeExternalId, updatedFakeTeamId),
+				Config: testEvidentExternalAccountConfig(updatedFakeArn, updatedFakeName, updatedFakeExternalId, updatedFakeTeamId),
 				Check: resource.ComposeTestCheckFunc(
 					testEvidentExternalAccountExists("evident_external_account.test_account"),
 					resource.TestCheckResourceAttr(
 						"evident_external_account.test_account", "arn", updatedFakeArn),
+					resource.TestCheckResourceAttr(
+						"evident_external_account.test_account", "name", updatedFakeName),
 					resource.TestCheckResourceAttr(
 						"evident_external_account.test_account", "external_id", updatedFakeExternalId),
 				),

@@ -67,12 +67,6 @@ type CmdAddExternalAccountAttributes struct {
 	TeamID     string `json:"team_id"`
 }
 
-//TODO: FIX Logic:
-//We don't have Name and Provider in the attributes they are in related entities
-//so our resource assessment is wrong (only ids and arns work which should suffice for now)
-//at some point we should integrate the jsonapi client into this
-//also we don't add team id to resources which might cause troubles in the future
-
 type ExternalAccountAttributes struct {
 	Name       string `json:"name"`
 	Provider   string `json:"provider"`

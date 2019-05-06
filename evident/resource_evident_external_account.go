@@ -74,6 +74,7 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	log.Printf("[DEBUG] external_account read: (ARN: %q, Name: %q, ExternalID: %q)", account.Attributes.Arn, account.Attributes.Name, account.Attributes.ExternalID)
+	d.Set("name", account.Attributes.Name)
 	d.Set("arn", account.Attributes.Arn)
 	d.Set("external_id", account.Attributes.ExternalID)
 
