@@ -33,8 +33,4 @@
 # Terraform files
 terraform.d/
 
-<<<<<<< HEAD
 .vscode/*
-=======
-*.vscode
->>>>>>> 044c4b1... make client testable by adding a configurable http client

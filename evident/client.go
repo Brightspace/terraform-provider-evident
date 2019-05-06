@@ -121,17 +121,6 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 
 	}
 
-	/*
-	* //TODO: FIX Logic:
-	* This logic doesn't seem to be correct. must be tested with real api data.
-	* Commented out for now.
-
-	contentType := resp.Header.Get("Content-Type")
-	if contentType == "application/vnd.api+json" {
-		return "", fmt.Errorf("Content-Type is not a json type. Got: %s", contentType)
-	}
-	*/
-
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("Error while reading response body. %s", err)
