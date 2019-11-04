@@ -49,7 +49,7 @@ func resourceExternalAccountCreate(d *schema.ResourceData, meta interface{}) err
 	teamID := d.Get("team_id").(string)
 
 	log.Printf("[DEBUG] external_account set: (ARN: %q, Name: %q, ExternalID: %q)", arn, name, externalID)
-	account, err := client.add(name, arn, externalID, teamID)
+	account, err := client.Add(name, arn, externalID, teamID)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 	client := config.EvidentClient
 
 	log.Printf("[DEBUG] external_account get: (ID: %q)", d.Id())
-	account, err := client.get(d.Id())
+	account, err := client.Get(d.Id())
 	if err != nil {
 		d.SetId("")
 		return err
@@ -91,7 +91,7 @@ func resourceExternalAccountUpdate(d *schema.ResourceData, meta interface{}) err
 	teamID := d.Get("team_id").(string)
 
 	log.Printf("[DEBUG] external_account set: (ARN: %q, Name: %q, ExternalID: %q)", arn, name, externalID)
-	account, err := client.update(d.Id(), name, arn, externalID, teamID)
+	account, err := client.Update(d.Id(), name, arn, externalID, teamID)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func resourceExternalAccountDelete(d *schema.ResourceData, meta interface{}) err
 	client := config.EvidentClient
 
 	log.Printf("[DEBUG] external_account delete: (ID: %q)", d.Id())
-	_, err := client.delete(d.Id())
+	_, err := client.Delete(d.Id())
 	if err != nil {
 		return err
 	}
