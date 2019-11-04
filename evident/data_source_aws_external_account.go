@@ -11,7 +11,7 @@ func dataSourceAwsExternalAccount() *schema.Resource {
 		Read: dataSourceAwsExternalAccountRead,
 
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"account": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The unique identifier of the external account",
@@ -38,16 +38,17 @@ func dataSourceAwsExternalAccount() *schema.Resource {
 func dataSourceAwsExternalAccountRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	client := config.EvidentClient
-	identifier := d.Get("identifier").(string)
+	id := d.Get("account").(string)
 
-	log.Printf("[DEBUG] external_account get: (ID: %q)", identifier)
-	account, err := client.Get(identifier)
+	log.Printf("[DEBUG] external_account_aws get: (ID: %q)", id)
+	account, err := client.Get(id)
 	if err != nil {
-		d.SetId("")
+		log.Printf("[DEBUG] external_account_aws not found: (ID: %q)", id)
 		return err
 	}
 
-	log.Printf("[DEBUG] external_account read: (ARN: %q, Name: %q, ExternalID: %q)", account.Attributes.Arn, account.Attributes.Name, account.Attributes.ExternalID)
+	log.Printf("[DEBUG] external_account_aws read: (ARN: %q, Name: %q, ExternalID: %q)", account.Attributes.Arn, account.Attributes.Name, account.Attributes.ExternalID)
+	d.SetId(id)
 	d.Set("name", account.Attributes.Name)
 	d.Set("arn", account.Attributes.Arn)
 	d.Set("external_id", account.Attributes.ExternalID)
