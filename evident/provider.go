@@ -1,6 +1,7 @@
 package evident
 
 import (
+	"github.com/Brightspace/terraform-provider-evident/evident/api"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -29,8 +30,8 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	client := Evident{
-		Credentials: Credentials{
+	client := api.Evident{
+		Credentials: api.Credentials{
 			AccessKey: []byte(d.Get("access_key").(string)),
 			SecretKey: []byte(d.Get("secret_key").(string)),
 		},

@@ -1,4 +1,4 @@
-package evident
+package api
 
 import (
 	"bytes"
@@ -147,7 +147,7 @@ func (evident *Evident) GetHttpClient() *http.Client {
 	return evident.HttpClient
 }
 
-func (evident *Evident) all() ([]ExternalAccount, error) {
+func (evident *Evident) All() ([]ExternalAccount, error) {
 	var response EvidentResponse
 	var result []ExternalAccount
 
@@ -175,7 +175,7 @@ func (evident *Evident) all() ([]ExternalAccount, error) {
 	return result, nil
 }
 
-func (evident *Evident) get(account string) (ExternalAccount, error) {
+func (evident *Evident) Get(account string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
@@ -213,7 +213,7 @@ func (evident *Evident) get(account string) (ExternalAccount, error) {
 	return result, nil
 }
 
-func (evident *Evident) delete(account string) (bool, error) {
+func (evident *Evident) Delete(account string) (bool, error) {
 	var err error
 
 	request := EvidentRequest{
@@ -238,7 +238,7 @@ func (evident *Evident) delete(account string) (bool, error) {
 	return true, nil
 }
 
-func (evident *Evident) add(name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
+func (evident *Evident) Add(name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
@@ -290,7 +290,7 @@ func (evident *Evident) add(name string, arn string, externalID string, teamID s
 	return result, nil
 }
 
-func (evident *Evident) update(account string, name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
+func (evident *Evident) Update(account string, name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
 	var response EvidentResponse
 	var result ExternalAccount
 	var err error
