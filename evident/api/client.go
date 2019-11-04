@@ -2,10 +2,6 @@ package api
 
 import (
 	"bytes"
-	"crypto/hmac"
-	"crypto/md5"
-	"crypto/sha1"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -75,32 +71,6 @@ type ExternalAccountAttributes struct {
 	ExternalID string `json:"external_id"`
 }
 
-func makeHeaders(now time.Time, req EvidentRequest, creds Credentials) (map[string]interface{}, error) {
-	headers := make(map[string]interface{})
-
-	ctype := "application/vnd.api+json"
-	md5sum := md5.Sum(req.Contents)
-	md5 := base64.StdEncoding.EncodeToString(md5sum[:])
-	utc := now.Format(http.TimeFormat)
-	request := fmt.Sprintf("%s,%s,%s,%s,%s", req.Method, ctype, md5, req.URL, utc)
-	encodedAuth := makeAuth([]byte(request), []byte(creds.SecretKey))
-
-	headers["Accept"] = ctype
-	headers["Content-Type"] = ctype
-	headers["Content-MD5"] = md5
-	headers["Date"] = utc
-
-	headers["Authorization"] = fmt.Sprintf("APIAuth %s:%s", creds.AccessKey, encodedAuth)
-
-	return headers, nil
-}
-
-func makeAuth(message []byte, key []byte) string {
-	hash := hmac.New(sha1.New, key)
-	hash.Write(message)
-	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
-}
-
 func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (string, error) {
 	baseURL := "https://api.evident.io"
 	client := evident.GetHttpClient()
@@ -113,7 +83,7 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 	}
 
 	t := time.Now().UTC()
-	headers, _ := makeHeaders(t, request, creds)
+	headers, _ := NewHTTPSignature(request.URL, request.Method, request.Contents, t, string(creds.AccessKey), string(creds.SecretKey))
 	for name, value := range headers {
 		req.Header.Set(name, value.(string))
 	}
