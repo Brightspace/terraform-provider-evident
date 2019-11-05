@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/Brightspace/terraform-provider-evident/evident/api"
-	"os"
-	"log"
 	"fmt"
+	"github.com/Brightspace/terraform-provider-evident/evident/api"
+	"log"
+	"os"
 )
 
 func main() {
@@ -13,7 +13,6 @@ func main() {
 	}
 	arg := os.Args[1]
 
-	
 	client := api.Evident{
 		Credentials: api.Credentials{
 			AccessKey: []byte(os.Getenv("EVIDENT_ACCESS_KEY")),
@@ -21,9 +20,9 @@ func main() {
 		},
 		RetryMaximum: 5,
 	}
-	
+
 	result, _ := client.Get(arg)
-    fmt.Println("id:\n", result.ID)
+	fmt.Println("id:\n", result.ID)
 	fmt.Println("name:\n", result.Attributes.Name)
 	fmt.Println("arn:\n", result.Attributes.Arn)
 	fmt.Println("external_id:\n", result.Attributes.ExternalID)
