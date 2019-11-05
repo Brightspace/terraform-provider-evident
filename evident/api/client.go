@@ -126,7 +126,17 @@ func (evident *Evident) GetRestClient() *resty.Client {
 	if evident.RestClient == nil {
 		rest := resty.New()
 		rest.SetHostURL("https://api.evident.io")
-
+		rest.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
+			t := time.Now().UTC()
+			key := string(evident.Credentials.AccessKey)
+			secret := string(evident.Credentials.SecretKey)
+			//body to bytes
+			sign, _ := NewHTTPSignature(r.URL, r.Method, []byte(""), t, key, secret)
+			for name, value := range sign {
+				r.SetHeader(name, value.(string))
+			}
+			return nil
+		})
 		evident.RestClient = rest
 	}
 	return evident.RestClient
@@ -163,14 +173,9 @@ func (evident *Evident) All() ([]ExternalAccount, error) {
 func (evident *Evident) Get(account string) (ExternalAccount, error) {
 	var result ExternalAccount
 	restClient := evident.GetRestClient()
-	credentials := evident.Credentials
 
 	url := fmt.Sprintf("/api/v2/external_accounts/%s", account)
 	req := restClient.R().SetBody("").SetResult(&getExternalAccountAws{})
-	sign, _ := NewHTTPSignature(url, "GET", []byte(""), time.Now().UTC(), string(credentials.AccessKey), string(credentials.SecretKey))
-	for name, value := range sign {
-		req = req.SetHeader(name, value.(string))
-	}
 
 	resp, err := req.Get(url)
 	if err != nil {
