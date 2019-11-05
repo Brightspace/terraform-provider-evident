@@ -130,8 +130,7 @@ func (evident *Evident) GetRestClient() *resty.Client {
 			t := time.Now().UTC()
 			key := string(evident.Credentials.AccessKey)
 			secret := string(evident.Credentials.SecretKey)
-			//body to bytes
-			sign, _ := NewHTTPSignature(r.URL, r.Method, []byte(""), t, key, secret)
+			sign, _ := NewHTTPSignature(r.URL, r.Method, []byte(r.Body.(string)), t, key, secret)
 			for name, value := range sign {
 				r.SetHeader(name, value.(string))
 			}
