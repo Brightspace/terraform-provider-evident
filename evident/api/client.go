@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/matryer/try"
 )
 
@@ -29,13 +30,24 @@ type EvidentResponse struct {
 
 type Evident struct {
 	HttpClient   *http.Client
+	RestClient   *resty.Client
 	Credentials  Credentials
 	RetryMaximum int
 }
 
+type getExternalAccountAws struct {
+	Data ExternalAccount `json:"data"`
+}
+
 type ExternalAccount struct {
-	ID         interface{}               `json:"id"`
-	Attributes ExternalAccountAttributes `json:"attributes"`
+	ID         interface{} `json:"id"`
+	Attributes  struct {
+		Name       string `json:"name"`
+		Provider   string `json:"provider"`
+		Arn        string `json:"arn"`
+		Account    string `json:"account"`
+		ExternalID string `json:"external_id"`
+	} `json:"attributes"`
 }
 
 func (ec *ExternalAccount) GetIdString() string {
@@ -61,14 +73,6 @@ type CmdAddExternalAccountAttributes struct {
 	ExternalID string `json:"external_id"`
 	ARN        string `json:"arn"`
 	TeamID     string `json:"team_id"`
-}
-
-type ExternalAccountAttributes struct {
-	Name       string `json:"name"`
-	Provider   string `json:"provider"`
-	Arn        string `json:"arn"`
-	Account    string `json:"account"`
-	ExternalID string `json:"external_id"`
 }
 
 func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (string, error) {
@@ -106,6 +110,7 @@ func (evident *Evident) makeRequest(request EvidentRequest, creds Credentials) (
 
 	return string(bytes), nil
 }
+
 func (evident *Evident) SetHttpClient(client *http.Client) {
 	evident.HttpClient = client
 }
@@ -115,6 +120,16 @@ func (evident *Evident) GetHttpClient() *http.Client {
 		evident.HttpClient = &http.Client{}
 	}
 	return evident.HttpClient
+}
+
+func (evident *Evident) GetRestClient() *resty.Client {
+	if evident.RestClient == nil {
+		rest := resty.New()
+		rest.SetHostURL("https://api.evident.io")
+
+		evident.RestClient = rest
+	}
+	return evident.RestClient
 }
 
 func (evident *Evident) All() ([]ExternalAccount, error) {
@@ -146,41 +161,24 @@ func (evident *Evident) All() ([]ExternalAccount, error) {
 }
 
 func (evident *Evident) Get(account string) (ExternalAccount, error) {
-	var response EvidentResponse
 	var result ExternalAccount
-	var err error
-	var resp string
+	restClient := evident.GetRestClient()
+	credentials := evident.Credentials
 
-	request := EvidentRequest{
-		Method:   "GET",
-		URL:      "/api/v2/external_accounts/" + account,
-		Contents: []byte(""),
+	url := fmt.Sprintf("/api/v2/external_accounts/%s", account)
+	req := restClient.R().SetBody("").SetResult(&getExternalAccountAws{})
+	sign, _ := NewHTTPSignature(url, "GET", []byte(""), time.Now().UTC(), string(credentials.AccessKey), string(credentials.SecretKey))
+	for name, value := range sign {
+		req = req.SetHeader(name, value.(string))
 	}
 
-	err = try.Do(func(ampt int) (bool, error) {
-		var err error
-		resp, err = evident.makeRequest(request, evident.Credentials)
-		if err != nil {
-			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
-			time.Sleep(30 * time.Second)
-		}
-		return ampt < evident.RetryMaximum, err
-	})
+	resp, err := req.Get(url)
 	if err != nil {
 		return result, err
 	}
-
-	err = json.Unmarshal([]byte(resp), &response)
-	if err != nil {
-		return result, err
-	}
-
-	err = json.Unmarshal([]byte(response.Data), &result)
-	if err != nil {
-		return result, err
-	}
-
-	return result, nil
+	
+	response := resp.Result().(*getExternalAccountAws)
+	return response.Data, nil
 }
 
 func (evident *Evident) Delete(account string) (bool, error) {
