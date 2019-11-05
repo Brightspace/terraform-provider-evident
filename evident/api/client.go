@@ -211,55 +211,38 @@ func (evident *Evident) Delete(account string) (bool, error) {
 }
 
 func (evident *Evident) Add(name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
-	var response EvidentResponse
 	var result ExternalAccount
-	var err error
-	var resp string
+	restClient := evident.GetRestClient()
 
-	cmd := CmdAddExternalAccount{
-		Data: CmdAddExternalAccountPayload{
-			Type: "external_accounts",
-			Attributes: CmdAddExternalAccountAttributes{
-				Name:       name,
-				ExternalID: externalID,
-				TeamID:     teamID,
-				ARN:        arn,
+	payload := map[string]interface{}{
+		"data": map[string]interface{}{
+			"type": "external_accounts",
+			"attributes": map[string]string{
+				"name": name,
+				"arn": arn,
+				"team_id": teamID,
+				"external_id": externalID,
 			},
 		},
 	}
 
-	payloadJSON, err := json.Marshal(cmd)
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return result, err
 	}
 
-	request := EvidentRequest{
-		Method:   "POST",
-		URL:      "/api/v2/external_accounts",
-		Contents: payloadJSON,
-	}
+	url := "/api/v2/external_accounts"
+	req := restClient.R().SetBody(string(body)).SetResult(&getExternalAccountAws{})
 
-	err = try.Do(func(ampt int) (bool, error) {
-		var err error
-		resp, err = evident.makeRequest(request, evident.Credentials)
-		if err != nil {
-			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
-			time.Sleep(30 * time.Second)
-		}
-		return ampt < evident.RetryMaximum, err
-	})
-
-	err = json.Unmarshal([]byte(resp), &response)
+	resp, err := req.Post(url)
 	if err != nil {
 		return result, err
 	}
 
-	err = json.Unmarshal([]byte(response.Data), &result)
-	if err != nil {
-		return result, err
-	}
-
-	return result, nil
+	response := resp.Result().(*getExternalAccountAws)
+	response.Data.Attributes.Arn = arn
+	response.Data.Attributes.ExternalID = externalID
+	return response.Data, nil
 }
 
 func (evident *Evident) Update(account string, name string, arn string, externalID string, teamID string) (ExternalAccount, error) {
