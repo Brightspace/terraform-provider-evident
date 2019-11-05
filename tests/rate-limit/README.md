@@ -1,4 +1,4 @@
-# Evident API GET
+# Evident API Rate Limiting
 
 This example is for fiddling with the usage of the Evident API. This can be used to perform some exploratory testing with the Evident API.
 
