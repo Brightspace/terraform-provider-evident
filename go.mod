@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.47.0 // indirect
 	cloud.google.com/go/storage v1.1.2 // indirect
 	github.com/aws/aws-sdk-go v1.25.26 // indirect
+	github.com/go-resty/resty/v2 v2.1.0
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
 	github.com/hashicorp/go-plugin v1.0.1 // indirect
