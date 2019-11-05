@@ -169,8 +169,8 @@ func (evident *Evident) All() ([]ExternalAccount, error) {
 	return result, nil
 }
 
-func (evident *Evident) Get(account string) (ExternalAccount, error) {
-	var result ExternalAccount
+func (evident *Evident) Get(account string) (*ExternalAccount, error) {
+	var result *ExternalAccount
 	restClient := evident.GetRestClient()
 
 	url := fmt.Sprintf("/api/v2/external_accounts/%s", account)
@@ -182,31 +182,24 @@ func (evident *Evident) Get(account string) (ExternalAccount, error) {
 	}
 	
 	response := resp.Result().(*getExternalAccountAws)
-	return response.Data, nil
+	if response != nil {
+		result = &response.Data
+	}
+
+	return result, nil
 }
 
 func (evident *Evident) Delete(account string) (bool, error) {
-	var err error
+	restClient := evident.GetRestClient()
 
-	request := EvidentRequest{
-		Method:   "DELETE",
-		URL:      "/api/v2/external_accounts/" + account,
-		Contents: []byte(""),
-	}
+	url := fmt.Sprintf("/api/v2/external_accounts/%s", account)
+	req := restClient.R().SetBody("")
 
-	err = try.Do(func(ampt int) (bool, error) {
-		var err error
-		_, err = evident.makeRequest(request, evident.Credentials)
-		if err != nil {
-			log.Printf("[DEBUG] retrying request: (Attempt: %d/%d, URL: %q)", ampt, evident.RetryMaximum, err)
-			time.Sleep(30 * time.Second)
-		}
-		return ampt < evident.RetryMaximum, err
-	})
+	_, err := req.Delete(url)
 	if err != nil {
 		return false, err
 	}
-
+	
 	return true, nil
 }
 

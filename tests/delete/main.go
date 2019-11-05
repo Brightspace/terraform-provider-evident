@@ -22,7 +22,8 @@ func main() {
 	}
 
 	resp, _ := client.Delete(arg)
-
+	fmt.Println(resp)
+	
 	result, _ := client.Get(arg)
 	if result != nil {
 		fmt.Println("success:\n", arg)
