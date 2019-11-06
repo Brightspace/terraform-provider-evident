@@ -20,6 +20,7 @@ terraform-provider*
 
 # End of https://www.gitignore.io/api/go
 
+*.env
 
 # Created by https://www.gitignore.io/api/terraform
 
