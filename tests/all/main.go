@@ -16,7 +16,7 @@ func main() {
 	}
 
 	result, _ := client.All()
-	for _, element := range(result) {
+	for _, element := range result {
 		fmt.Println("name:\n", element.Attributes.Name)
 	}
 }

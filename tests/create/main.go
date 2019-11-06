@@ -24,7 +24,7 @@ func main() {
 		RetryMaximum: 5,
 	}
 
-	result, err := client.Add(name, arn, external_id, team_id)
+	result, _ := client.Add(name, arn, external_id, team_id)
 	fmt.Println("id:\n", result.ID)
 	fmt.Println("name:\n", result.Attributes.Name)
 	fmt.Println("arn:\n", result.Attributes.Arn)

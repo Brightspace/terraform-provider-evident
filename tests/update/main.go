@@ -8,10 +8,14 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Missing ID for evident resource")
+	if len(os.Args) < 5 {
+		log.Fatal("Missing required inputs")
 	}
-	arg := os.Args[1]
+	name := "EvidentProviderTestUpdate"
+	id := os.Args[1]
+	arn := os.Args[2]
+	team_id := os.Args[3]
+	external_id := os.Args[4]
 
 	client := api.Evident{
 		Credentials: api.Credentials{
@@ -21,7 +25,8 @@ func main() {
 		RetryMaximum: 5,
 	}
 
-	result, _ := client.Get(arg)
+	result, err := client.Update(id, name, arn, external_id, team_id)
+	fmt.Println("err:\n", err)
 	fmt.Println("id:\n", result.ID)
 	fmt.Println("name:\n", result.Attributes.Name)
 	fmt.Println("arn:\n", result.Attributes.Arn)
