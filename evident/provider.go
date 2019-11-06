@@ -12,13 +12,13 @@ func Provider() terraform.ResourceProvider {
 			"access_key": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The working directory where to run.",
+				Description: "This is the Evident access key. It must be provided, but it can also be sourced from the `EVIDENT_ACCESS_KEY` environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("EVIDENT_ACCESS_KEY", nil),
 			},
 			"secret_key": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Create command",
+				Description: "This is the Evident secret key. It must be provided, but it can also be sourced from the `EVIDENT_SECRET_KEY` environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("EVIDENT_SECRET_KEY", nil),
 			},
 		},
