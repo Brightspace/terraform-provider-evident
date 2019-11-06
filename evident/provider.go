@@ -23,8 +23,8 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"evident_external_account":     resourceExternalAccount(),
-			"evident_external_account_aws": resourceExternalAccount(),
+			"evident_external_account":     resourceAwsExternalAccount(),
+			"evident_external_account_aws": resourceAwsExternalAccount(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"evident_external_account_aws": dataSourceAwsExternalAccount(),

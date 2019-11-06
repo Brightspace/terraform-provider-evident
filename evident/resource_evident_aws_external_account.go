@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceExternalAccount() *schema.Resource {
+func resourceAwsExternalAccount() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceExternalAccountCreate,
 		Read:   resourceExternalAccountRead,

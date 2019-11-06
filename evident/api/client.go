@@ -32,7 +32,7 @@ type allExternalAccountAws struct {
 }
 
 type ExternalAccount struct {
-	ID         interface{} `json:"id"`
+	ID         string `json:"id"`
 	Attributes struct {
 		Name       string `json:"name"`
 		Provider   string `json:"provider"`
