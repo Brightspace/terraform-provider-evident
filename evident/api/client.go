@@ -18,7 +18,6 @@ type Credentials struct {
 }
 
 type Evident struct {
-	HttpClient   *http.Client
 	RestClient   *resty.Client
 	Credentials  Credentials
 	RetryMaximum int
@@ -43,66 +42,51 @@ type ExternalAccount struct {
 	} `json:"attributes"`
 }
 
-func (ec *ExternalAccount) GetIdString() string {
-	switch v := ec.ID.(type) {
-	case float64:
-		return fmt.Sprintf("%.0f", v)
-	default:
-		return fmt.Sprintf("%+v", v)
-	}
-}
+func (evident *Evident) SetRestClient(rest *resty.Client) {
+	rest.SetHostURL("https://api.evident.io")
+	
+	// Retry
+	rest.SetRetryCount(evident.RetryMaximum)
+	rest.SetRetryWaitTime(RetryWaitTimeInSeconds)
+	rest.SetRetryMaxWaitTime(MaximumRetryWaitTimeInSeconds)
+	rest.AddRetryCondition(func(r *resty.Response, err error) bool {
+		switch code := r.StatusCode(); code {
+		case http.StatusTooManyRequests:
+			return true
+		default:
+			return false
+		}
+	})
+	
+	// Error handling
+	rest.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
+		status := r.StatusCode()
+		if (status < 200) || (status >= 400) {
+			return fmt.Errorf("Response not successful: Received status code %d.", status)
+		}
+		
+		return nil
+	})
+	
+	//Authentication
+	rest.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
+		t := time.Now().UTC()
+		key := string(evident.Credentials.AccessKey)
+		secret := string(evident.Credentials.SecretKey)
+		sign, _ := NewHTTPSignature(r.URL, r.Method, []byte(r.Body.(string)), t, key, secret)
+		for name, value := range sign {
+			r.SetHeader(name, value.(string))
+		}
+		return nil
+	})
 
-func (evident *Evident) SetHttpClient(client *http.Client) {
-	evident.HttpClient = client
-}
-
-func (evident *Evident) GetHttpClient() *http.Client {
-	if evident.HttpClient == nil {
-		evident.HttpClient = &http.Client{}
-	}
-	return evident.HttpClient
+	evident.RestClient = rest
 }
 
 func (evident *Evident) GetRestClient() *resty.Client {
 	if evident.RestClient == nil {
 		rest := resty.New()
-		rest.SetHostURL("https://api.evident.io")
-
-		// Retry
-		rest.SetRetryCount(evident.RetryMaximum)
-		rest.SetRetryWaitTime(RetryWaitTimeInSeconds)
-		rest.SetRetryMaxWaitTime(MaximumRetryWaitTimeInSeconds)
-		rest.AddRetryCondition(func(r *resty.Response, err error) bool {
-			switch code := r.StatusCode(); code {
-			case http.StatusTooManyRequests:
-				return true
-			default:
-				return false
-			}
-		})
-		
-		// Error handling
-		rest.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
-			status := r.StatusCode()
-			if (status < 200) || (status >= 400) {
-				return fmt.Errorf("Response not successful: Received status code %d.", status)
-			}
-
-			return nil
-		})
-
-		//Authentication
-		rest.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
-			t := time.Now().UTC()
-			key := string(evident.Credentials.AccessKey)
-			secret := string(evident.Credentials.SecretKey)
-			sign, _ := NewHTTPSignature(r.URL, r.Method, []byte(r.Body.(string)), t, key, secret)
-			for name, value := range sign {
-				r.SetHeader(name, value.(string))
-			}
-			return nil
-		})
-		evident.RestClient = rest
+		evident.SetRestClient(rest)
 	}
 	return evident.RestClient
 }
