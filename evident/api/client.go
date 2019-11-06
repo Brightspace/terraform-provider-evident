@@ -44,7 +44,7 @@ type ExternalAccount struct {
 
 func (evident *Evident) SetRestClient(rest *resty.Client) {
 	rest.SetHostURL("https://api.evident.io")
-	
+
 	// Retry
 	rest.SetRetryCount(evident.RetryMaximum)
 	rest.SetRetryWaitTime(RetryWaitTimeInSeconds)
@@ -57,17 +57,17 @@ func (evident *Evident) SetRestClient(rest *resty.Client) {
 			return false
 		}
 	})
-	
+
 	// Error handling
 	rest.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
 		status := r.StatusCode()
 		if (status < 200) || (status >= 400) {
 			return fmt.Errorf("Response not successful: Received status code %d.", status)
 		}
-		
+
 		return nil
 	})
-	
+
 	//Authentication
 	rest.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
 		t := time.Now().UTC()

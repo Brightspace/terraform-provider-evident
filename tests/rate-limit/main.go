@@ -21,7 +21,7 @@ func main() {
 		},
 		RetryMaximum: 5,
 	}
-	
+
 	for i := 0; i < counter; i++ {
 		result, err := client.Get(id)
 		if err != nil {
