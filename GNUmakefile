@@ -1,11 +1,15 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
-PKG_NAME=$(shell basename $(CURDIR))
+PROJ_NAME=terraform-provider-evident
+TESTVARS=TF_ACC=1 EVIDENT_ACCESS_KEY=something EVIDENT_SECRET_KEY=somethingelse
 
 default: build
+.PHONY: build build/nix build/win test testacc vet fmt fmtcheck errcheck
 
-build: fmtcheck
-	go build
+build: build/nix build/win
+
+build/nix: fmtcheck
+	GOOS=linux go build
 
 build/win: fmtcheck
 	GOOS=windows go build
@@ -15,8 +19,8 @@ get:
 
 docker:
 	docker run --rm -it \
-		-v $(PWD):/srv/Brightspace/$(PKG_NAME) \
-		--workdir /srv/Brightspace/$(PKG_NAME) \
+		-v $(PWD):/srv/Brightspace/$(PROJ_NAME) \
+		--workdir /srv/Brightspace/$(PROJ_NAME) \
 		golang bash
 
 test: fmtcheck
@@ -25,7 +29,7 @@ test: fmtcheck
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: fmtcheck
-	TF_ACC=1 EVIDENT_ACCESS_KEY=something EVIDENT_SECRET_KEY=somethingelse go test $(TEST) -v $(TESTARGS) -timeout 120m
+	$(TESTVARS) go test $(TEST) -v $(TESTARGS) -timeout 120m
 
 vet:
 	@echo "go vet ."
@@ -44,6 +48,3 @@ fmtcheck:
 
 errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
-
-.PHONY: build test testacc vet fmt fmtcheck errcheck
-
