@@ -21,7 +21,16 @@ func main() {
 		RetryMaximum: 5,
 	}
 
-	result, _ := client.Get(arg)
+	result, err := client.Get(arg)
+	if result == nil {
+		fmt.Println("id could not be found:\n", arg)
+		return
+	}
+
+	if err != nil {
+		fmt.Println("err:\n", err)
+		return
+	}
 	fmt.Println("id:\n", result.ID)
 	fmt.Println("name:\n", result.Attributes.Name)
 	fmt.Println("arn:\n", result.Attributes.Arn)

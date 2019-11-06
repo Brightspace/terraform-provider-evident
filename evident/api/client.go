@@ -61,6 +61,10 @@ func (evident *Evident) SetRestClient(rest *resty.Client) {
 	// Error handling
 	rest.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
 		status := r.StatusCode()
+		if status == http.StatusNotFound {
+			return nil
+		}
+
 		if (status < 200) || (status >= 400) {
 			return fmt.Errorf("Response not successful: Received status code %d.", status)
 		}
@@ -119,6 +123,11 @@ func (evident *Evident) Get(account string) (*ExternalAccount, error) {
 	resp, err := req.Get(url)
 	if err != nil {
 		return nil, err
+	}
+
+	status := resp.StatusCode()
+	if status == http.StatusNotFound {
+		return nil, nil
 	}
 
 	response := resp.Result().(*getExternalAccountAws)
