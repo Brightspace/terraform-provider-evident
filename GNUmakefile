@@ -15,8 +15,8 @@ get:
 
 docker:
 	docker run --rm -it \
-		-v $(PWD):/srv/Brightspace/terraform-provider-$(PKG_NAME) \
-		--workdir /srv/Brightspace/terraform-provider-$(PKG_NAME) \
+		-v $(PWD):/srv/Brightspace/$(PKG_NAME) \
+		--workdir /srv/Brightspace/$(PKG_NAME) \
 		golang bash
 
 test: fmtcheck
