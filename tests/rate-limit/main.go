@@ -11,7 +11,8 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("Missing ID for evident resource")
 	}
-	arg := os.Args[1]
+	id := os.Args[1]
+	counter := 10
 
 	client := api.Evident{
 		Credentials: api.Credentials{
@@ -20,10 +21,18 @@ func main() {
 		},
 		RetryMaximum: 5,
 	}
-
-	result, _ := client.Get(arg)
-	fmt.Println("id:\n", result.ID)
-	fmt.Println("name:\n", result.Attributes.Name)
-	fmt.Println("arn:\n", result.Attributes.Arn)
-	fmt.Println("external_id:\n", result.Attributes.ExternalID)
+	
+	for i := 0; i < counter; i++ {
+		result, err := client.Get(id)
+		if err != nil {
+			fmt.Println("Encountered an error:\n", err)
+		} else if result == nil {
+			fmt.Println("404 not found")
+		} else if result.ID != id {
+			fmt.Println("ID mismatch:\n", result.ID)
+		} else {
+			// Ignore sometimes
+			fmt.Println("ID:\n", result.ID)
+		}
+	}
 }
