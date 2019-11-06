@@ -23,7 +23,7 @@ release:
     owner: Brightspace
     name: terraform-provider-evident
   prerelease: auto
-  name_template: "{{.ProjectName}} v{{.Version}}"
+  name_template: "v{{.Version}}"
 # Disable until switch from auto to manual IAM credentials (secrets has no API atm)
 # s3:
 # -
