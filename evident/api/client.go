@@ -64,6 +64,31 @@ func (evident *Evident) GetRestClient() *resty.Client {
 	if evident.RestClient == nil {
 		rest := resty.New()
 		rest.SetHostURL("https://api.evident.io")
+
+		// Retry
+		rest.SetRetryCount(evident.RetryMaximum)
+		rest.SetRetryWaitTime(60 * time.Second)
+		rest.SetRetryMaxWaitTime((5 * 60) * time.Second)
+		rest.AddRetryCondition(func(r *resty.Response, err error) bool {
+			switch code := r.StatusCode(); code {
+			case http.StatusTooManyRequests:
+				return true
+			default:
+				return false
+			}
+		})
+		
+		// Error handling
+		rest.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
+			status := r.StatusCode()
+			if (status < 200) || (status >= 400) {
+				return fmt.Errorf("Response not successful: Received status code %d.", status)
+			}
+
+			return nil
+		})
+
+		//Authentication
 		rest.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
 			t := time.Now().UTC()
 			key := string(evident.Credentials.AccessKey)
@@ -99,7 +124,6 @@ func (evident *Evident) All() ([]ExternalAccount, error) {
 }
 
 func (evident *Evident) Get(account string) (*ExternalAccount, error) {
-	var result *ExternalAccount
 	restClient := evident.GetRestClient()
 
 	url := fmt.Sprintf("/api/v2/external_accounts/%s", account)
@@ -107,15 +131,15 @@ func (evident *Evident) Get(account string) (*ExternalAccount, error) {
 
 	resp, err := req.Get(url)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 
 	response := resp.Result().(*getExternalAccountAws)
-	if response != nil {
-		result = &response.Data
+	if response == nil {
+		return nil, nil
 	}
 
-	return result, nil
+	return &response.Data, nil
 }
 
 func (evident *Evident) Delete(account string) (bool, error) {
