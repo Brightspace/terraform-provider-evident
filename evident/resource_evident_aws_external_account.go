@@ -68,8 +68,15 @@ func resourceExternalAccountRead(d *schema.ResourceData, meta interface{}) error
 
 	log.Printf("[DEBUG] external_account get: (ID: %q)", d.Id())
 	account, err := client.Get(d.Id())
+	if account == nil {
+		d.SetId("")
+		log.Printf("[DEBUG] external_account could not be found: (ID: %q)", d.Id())
+		return nil
+	}
+
 	if err != nil {
 		d.SetId("")
+		log.Printf("[DEBUG] external_account read error: %q", err)
 		return err
 	}
 
