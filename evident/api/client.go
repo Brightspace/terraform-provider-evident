@@ -1,11 +1,8 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	// "io/ioutil"
-	// "log"
 	"net/http"
 	"time"
 
@@ -86,7 +83,7 @@ func (evident *Evident) All() ([]ExternalAccount, error) {
 	var result []ExternalAccount
 	restClient := evident.GetRestClient()
 
-	url := "/api/v2/external_accounts/"
+	url := "/api/v2/external_accounts"
 	req := restClient.R().SetBody("").SetResult(&allExternalAccountAws{})
 	resp, err := req.Get(url)
 	if err != nil {
