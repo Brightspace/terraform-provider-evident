@@ -9,6 +9,9 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+const MaximumRetryWaitTimeInSeconds = 15 * time.Minute
+const RetryWaitTimeInSeconds = 30 * time.Second
+
 type Credentials struct {
 	AccessKey []byte
 	SecretKey []byte
@@ -67,8 +70,8 @@ func (evident *Evident) GetRestClient() *resty.Client {
 
 		// Retry
 		rest.SetRetryCount(evident.RetryMaximum)
-		rest.SetRetryWaitTime(60 * time.Second)
-		rest.SetRetryMaxWaitTime((5 * 60) * time.Second)
+		rest.SetRetryWaitTime(RetryWaitTimeInSeconds)
+		rest.SetRetryMaxWaitTime(MaximumRetryWaitTimeInSeconds)
 		rest.AddRetryCondition(func(r *resty.Response, err error) bool {
 			switch code := r.StatusCode(); code {
 			case http.StatusTooManyRequests:
