@@ -24,9 +24,8 @@ release:
     name: terraform-provider-evident
   prerelease: auto
   name_template: "v{{.Version}}"
-# Disable until switch from auto to manual IAM credentials (secrets has no API atm)
-# s3:
-# -
-#   bucket: tfreg
-#   region: us-east-1
-#   folder: "ace/providers/{{.ProjectName}}/{{.Version}}"
+s3:
+-
+  bucket: tfreg
+  region: us-east-1
+  folder: "ace/providers/{{.ProjectName}}/{{.Version}}"
