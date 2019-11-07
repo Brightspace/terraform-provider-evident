@@ -15,7 +15,7 @@ build/win: fmtcheck
 	GOOS=windows go build
 
 get:
-	go get -v -d
+	go mod download
 
 docker:
 	docker run --rm -it \
