@@ -24,8 +24,10 @@ release:
     name: terraform-provider-evident
   prerelease: auto
   name_template: "v{{.Version}}"
-s3:
+
+blobs:
 -
+  provider: s3
   bucket: tfreg
   region: us-east-1
   folder: "ace/providers/{{.ProjectName}}/{{.Version}}"
