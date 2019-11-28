@@ -28,3 +28,4 @@ blobs:
   provider: s3
   bucket: tfreg
   folder: "ace/providers/{{.ProjectName}}/{{.Version}}"
+  region: "us-east-1"
