@@ -1,4 +1,4 @@
-Terraform Provider
+Evident Terraform Provider
 ==================
 
 - Website: https://www.terraform.io
